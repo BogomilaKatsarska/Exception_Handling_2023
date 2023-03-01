@@ -3,6 +3,19 @@
 - Errors/грешки от самата система, обикновено се случват на сървъра/
 - Exceptions/cannot use same e-mail for different user, can be modified/
 - pip install bcrypt - pass hashing for your software and servers
+
+- multi-threading - more than 1worker does tasks
+- asynhronous - the server can take more requests
+- Celery - an asynchronous task queue/job queue based on distributed message passing.
+It is focused on real-time operation but supports scheduling as well
+pip install celery
+- Redis -
+python -m celery -A Exception_Handling_2023 worker -l info
+AWS:
+SES - Amazon Simple Email Service (connect via 'boto3' library)
+import boto3
+client = boto3.client('ses')
+S3 - scalable storage in the cloud
 """
 
 from pathlib import Path
@@ -123,3 +136,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"

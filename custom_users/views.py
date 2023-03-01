@@ -4,8 +4,11 @@ from django.template import loader
 from rest_framework import views, response, status
 from django.shortcuts import render
 import bcrypt
+import time
 
 from custom_users.models import CustomUser
+from custom_users.tasks import send_welcome_emails_to_new_users
+from services.ses import SESService
 
 
 def handler500(request, *args, **kwargs):
@@ -23,11 +26,19 @@ class GetCreateUsers(views.APIView):
 
     def post(self, request):
         user = CustomUser(**request.data)
-        # password = bcrypt.hashpw(request.data["password"], "123456")
-        # try:
-        user.save()
+        context = {"name": "Ines"}
         template = loader.get_template('index.html')
-        return HttpResponse(template.rener({'name': 'Ines'}, request))
+        # password = bcrypt.hashpw(request.data["password"], "123456")
+        try:
+            user.save()
+        except IntegrityError as ex:
+            template = loader.get_template('default_500.html')
+            context = {}
+        # TODO: send an email
+        # send_welcome_emails_to_new_users.delay()
+        SESService().send_email(user.email)
+        return HttpResponse(template.rener(context, request))
+
         # except IntegrityError as ex:
         #     return response.Response({"message": "email already exists"}, status=status.HTTP_400_BAD_REQUEST)
         # return response.Response({"message": "ok"})
